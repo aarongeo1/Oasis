@@ -5,11 +5,22 @@ from itertools import product
 from boundary import edmontonBoundary, calgaryBoundary
 from haversine import haversine
 
-def makeFDPlot(sourceFile, city, longkey, latkey, boundary):
-    dataFrame = pd.read_csv(sourceFile)
+def extractLongLat(srcFile, longkey, latkey):
+    dataFrame = pd.read_csv(srcFile)
     longitude = dataFrame[longkey].values
     latitude = dataFrame[latkey].values
+    return longitude, latitude
 
+def computeDistances(long, lat, longList, latList):
+    dist = [haversine(long,
+                      lat,
+                      storeLong,
+                      storeLat)
+            for storeLong, storeLat in zip(longList, latList)]
+    return dist
+
+def makeFDPlot(sourceFile, city, longkey, latkey, boundary):
+    longitude, latitude = extractLongLat(sourceFile, longkey, latkey)
     longbound, latbound = boundary
 
     extendRatio = 0.1
@@ -30,13 +41,10 @@ def makeFDPlot(sourceFile, city, longkey, latkey, boundary):
     distMesh = np.zeros(np.shape(longmesh))
 
     for i,j in product(range(len(longval)),range(len(latval))):
-        loDist = longitude-longmesh[i][j]
-        laDist = latitude - latmesh[i][j]
-        dist = [haversine(longmesh[i][j],
-                          latmesh[i][j],
-                          storeLong,
-                          storeLat)
-                for storeLong, storeLat in zip(longitude, latitude)]
+        dist = computeDistances(longmesh[i][j],
+                                latmesh[i][j],
+                                longitude,
+                                latitude)
         distMesh[i][j] = np.min(dist)
     plt.imshow(distMesh,
                #interpolation='spline36',
