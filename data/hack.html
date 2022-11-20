@@ -3,7 +3,25 @@
 <body onload="getLocation()">
 <p id="demo"></p>
 
-<script src = "getloc.js">
+<script>
+function getLocation(){
+    if (navigator.geolocation) 
+    {
+      navigator.geolocation.getCurrentPosition(function(position){
+        pass_values(position.coords.latitude, position.coords.longitude);
+      });
+      // some exception handling
+    }
+    
+    function pass_values(lat, long)
+    { 
+     const request = new XMLHttpRequest
+     console.log(lat)
+     console.log(long)
+     request.open('GET',`http://localhost:8000/hack/${lat}/${long}`)
+     request.send()
+    }
+    }</script>
 </script>
 
 </body>
