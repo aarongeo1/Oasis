@@ -34,7 +34,7 @@ def get(lat2,long2):
                 kmmin = km
                 latmin = lat1
                 longmin = long1
-    return(kmmin)
+    return(round(kmmin,2))
 
 if __name__ == "__main__":
     lat2 = 53.51214
