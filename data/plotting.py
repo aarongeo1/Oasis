@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from itertools import product
 from boundary import edmontonBoundary, calgaryBoundary
+from haversine import haversine
 
 def makeFDPlot(sourceFile, city, longkey, latkey, boundary):
     dataFrame = pd.read_csv(sourceFile)
@@ -31,7 +32,11 @@ def makeFDPlot(sourceFile, city, longkey, latkey, boundary):
     for i,j in product(range(len(longval)),range(len(latval))):
         loDist = longitude-longmesh[i][j]
         laDist = latitude - latmesh[i][j]
-        dist = np.sqrt(loDist**2 + laDist**2)
+        dist = [haversine(longmesh[i][j],
+                          latmesh[i][j],
+                          storeLong,
+                          storeLat)
+                for storeLong, storeLat in zip(longitude, latitude)]
         distMesh[i][j] = np.min(dist)
     plt.imshow(distMesh,
                #interpolation='spline36',
@@ -42,7 +47,7 @@ def makeFDPlot(sourceFile, city, longkey, latkey, boundary):
     plt.ylabel('Latitude')
     plt.title(f'Distance From Nearest Grocery Store - {city}')
     cbar = plt.colorbar()
-    cbar.ax.set_ylabel('Coordinate Distance')
+    cbar.ax.set_ylabel('Distance (km)')
     plt.plot(longbound, latbound, color='black')
     plt.savefig(f'plots/{city}Plot.jpg')
     plt.clf()
