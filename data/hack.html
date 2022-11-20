@@ -18,11 +18,15 @@ function getLocation(){
      const request = new XMLHttpRequest
      console.log(lat)
      console.log(long)
-     request.open('GET',`http://localhost:8000/hack/${lat}/${long}`)
-     request.send()
+     var link = document.getElementById("mapLink")
+     link.setAttribute("href",`http://127.0.0.1:8000/hack/${lat}/${long}`)
+        //request.open('GET',`http://localhost:8000/hack/${lat}/${long}`)
+     //request.send()
     }
-    }</script>
-</script>
 
+
+    }
+</script>
+<a id = "mapLink">Click here to go to see your nearest grocery store</a>
 </body>
 </html>
