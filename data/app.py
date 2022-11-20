@@ -8,6 +8,22 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
+templates = Jinja2Templates(directory="backendDemo/jinjaTemplates")
+
+app.mount("/plots", StaticFiles(directory="../plots"), name="plots")
+app.mount("/staticRes", StaticFiles(directory="backendDemo/staticRes"), name="staticRes")
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html.jinja", {"request": request})
+
+@app.get("/calgary", response_class=HTMLResponse)
+async def calgary_page(request: Request):
+    return templates.TemplateResponse("calgary.html.jinja", {"request": request})
+
+@app.get("/edmonton", response_class=HTMLResponse)
+async def edmonton_page(request: Request):
+    return templates.TemplateResponse("edmonton.html.jinja", {"request": request})
 
 @app.get("/hack/{lat}/{long}")
 async def read_item(lat,long):
@@ -17,7 +33,7 @@ def get(lat2,long2):
     kmmin = 99999999999999999
     latmin = 0
     longmin = 0
-    with open(r"C:\Users\Aaron Geo Binoy\Desktop\hack\idk-yet\data\cleandata\calgary.csv") as f:
+    with open(r"cleandata\calgary.csv") as f:
         reader = csv.DictReader(f)
         for row in reader:
             lat1 = float(row.get("latitude"))
@@ -28,7 +44,7 @@ def get(lat2,long2):
                 latmin = lat1
                 longmin = long1
 
-    with open(r"C:\Users\Aaron Geo Binoy\Desktop\hack\idk-yet\data\cleandata\edmonton.csv") as f:
+    with open(r"cleandata\edmonton.csv") as f:
         reader = csv.DictReader(f)
         for row in reader:
             lat1 = float(row.get("Latitude"))
@@ -41,6 +57,7 @@ def get(lat2,long2):
     return(round(kmmin,2))
 
 if __name__ == "__main__":
+    
     lat2 = 53.51214
     long2 = -113.5322387
     dict = read_item(lat2,long2)
